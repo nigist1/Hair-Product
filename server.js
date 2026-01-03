@@ -31,7 +31,7 @@ app.get('/health', (req, res) => {
 });
 
 /* -------------------- Serve React Frontend -------------------- */
-const frontendBuildPath = path.join(__dirname, 'frontend', 'build');
+const frontendBuildPath = path.join(__dirname, 'frontend', 'dist');
 
 if (fs.existsSync(frontendBuildPath)) {
   app.use(express.static(frontendBuildPath));
