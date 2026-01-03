@@ -36,10 +36,11 @@ const frontendBuildPath = path.join(__dirname, 'frontend', 'dist');
 if (fs.existsSync(frontendBuildPath)) {
   app.use(express.static(frontendBuildPath));
 
- 
-  app.use((req, res) => {
+  
+  app.get(/^(?!\/(auth|products|orders|health)).*$/, (req, res) => {
     res.sendFile(path.join(frontendBuildPath, 'index.html'));
   });
+
 } else {
   app.get('/', (req, res) => {
     res.status(200).json({
@@ -67,6 +68,7 @@ const startServer = async () => {
     process.exit(1);
   }
 };
+
 
 if (process.env.NODE_ENV !== 'test' && require.main === module) {
   startServer();
