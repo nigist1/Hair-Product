@@ -1,4 +1,3 @@
-
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -13,17 +12,17 @@ const orderRoutes = require('./routes/orderRoutes');
 
 const app = express();
 
-/* -------------------- Middleware -------------------- */
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* -------------------- API Routes -------------------- */
+
 app.use('/auth', authRoutes);
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
 
-/* -------------------- Health Check -------------------- */
+
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'OK',
@@ -31,17 +30,17 @@ app.get('/health', (req, res) => {
   });
 });
 
-/* -------------------- Serve React Frontend -------------------- */
-const frontendBuildPath = path.join(__dirname, 'frontend', 'build');
+
+const frontendBuildPath = path.join(__dirname, 'frontend', 'dist');
 
 if (fs.existsSync(frontendBuildPath)) {
   app.use(express.static(frontendBuildPath));
 
-  app.get('*', (req, res) => {
+ 
+  app.use((req, res) => {
     res.sendFile(path.join(frontendBuildPath, 'index.html'));
   });
 } else {
-  // Fallback if frontend build is missing
   app.get('/', (req, res) => {
     res.status(200).json({
       message: 'Backend is running. Frontend build not found.',
@@ -49,10 +48,10 @@ if (fs.existsSync(frontendBuildPath)) {
   });
 }
 
-/* -------------------- Error Handler -------------------- */
+
 app.use(errorHandler);
 
-/* -------------------- Server Start -------------------- */
+
 const PORT = process.env.PORT || 3000;
 
 const startServer = async () => {
