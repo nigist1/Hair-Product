@@ -36,13 +36,13 @@ const frontendBuildPath = path.join(__dirname, 'frontend', 'dist');
 if (fs.existsSync(frontendBuildPath)) {
   app.use(express.static(frontendBuildPath));
 
-\
+ 
   app.get(/.*/, (req, res) => {
     res.sendFile(path.join(frontendBuildPath, 'index.html'));
   });
 
 } else {
-
+  // Fallback if frontend build is missing
   app.get('/', (req, res) => {
     res.status(200).json({
       message: 'Backend is running. Frontend build not found.',
@@ -50,7 +50,9 @@ if (fs.existsSync(frontendBuildPath)) {
   });
 }
 
+
 app.use(errorHandler);
+
 
 const PORT = process.env.PORT || 3000;
 
