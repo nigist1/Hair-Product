@@ -18,9 +18,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-app.use('/auth', authRoutes);
-app.use('/products', productRoutes);
-app.use('/orders', orderRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
 
 
 app.get('/health', (req, res) => {
@@ -36,12 +36,13 @@ const frontendBuildPath = path.join(__dirname, 'frontend', 'dist');
 if (fs.existsSync(frontendBuildPath)) {
   app.use(express.static(frontendBuildPath));
 
-  
-  app.get(/^(?!\/(auth|products|orders|health)).*$/, (req, res) => {
+\
+  app.get(/.*/, (req, res) => {
     res.sendFile(path.join(frontendBuildPath, 'index.html'));
   });
 
 } else {
+
   app.get('/', (req, res) => {
     res.status(200).json({
       message: 'Backend is running. Frontend build not found.',
@@ -49,9 +50,7 @@ if (fs.existsSync(frontendBuildPath)) {
   });
 }
 
-
 app.use(errorHandler);
-
 
 const PORT = process.env.PORT || 3000;
 
@@ -68,7 +67,6 @@ const startServer = async () => {
     process.exit(1);
   }
 };
-
 
 if (process.env.NODE_ENV !== 'test' && require.main === module) {
   startServer();
