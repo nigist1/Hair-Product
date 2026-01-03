@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 require('dotenv').config();
 
 const connectDB = require('./config/database');
@@ -12,49 +13,61 @@ const orderRoutes = require('./routes/orderRoutes');
 
 const app = express();
 
-
+/* -------------------- Middleware -------------------- */
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-const frontendBuildPath = path.join(__dirname, 'frontend', 'build');
-app.use(express.static(frontendBuildPath));
-
+/* -------------------- API Routes -------------------- */
 app.use('/auth', authRoutes);
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
 
-
+/* -------------------- Health Check -------------------- */
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK', message: 'Server is running' });
+  res.status(200).json({
+    status: 'OK',
+    message: 'Server is running',
+  });
 });
 
+/* -------------------- Serve React Frontend -------------------- */
+const frontendBuildPath = path.join(__dirname, 'frontend', 'build');
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(frontendBuildPath, 'index.html'));
-});
+if (fs.existsSync(frontendBuildPath)) {
+  app.use(express.static(frontendBuildPath));
 
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendBuildPath, 'index.html'));
+  });
+} else {
+  // Fallback if frontend build is missing
+  app.get('/', (req, res) => {
+    res.status(200).json({
+      message: 'Backend is running. Frontend build not found.',
+    });
+  });
+}
 
+/* -------------------- Error Handler -------------------- */
 app.use(errorHandler);
 
-
+/* -------------------- Server Start -------------------- */
 const PORT = process.env.PORT || 3000;
 
 const startServer = async () => {
   try {
-    console.log('🔄 Connecting to MongoDB...');
+    console.log('Connecting to MongoDB...');
     await connectDB();
 
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+      console.log(`Server running on port ${PORT}`);
     });
   } catch (error) {
-    console.error('Unable to start server:', error);
+    console.error('Failed to start server:', error);
     process.exit(1);
   }
 };
-
 
 if (process.env.NODE_ENV !== 'test' && require.main === module) {
   startServer();
