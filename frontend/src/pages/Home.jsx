@@ -12,6 +12,9 @@ const Home = () => {
       try {
         const response = await productsAPI.getAll({ limit: 3 });
         setFeaturedProducts(response.data.products || []);
+//         const response = await productsAPI.getAll({ limit: 3 });
+// setFeaturedProducts(response.data.data || []);
+
       } catch (error) {
         console.error('Error fetching products:', error);
       } finally {
