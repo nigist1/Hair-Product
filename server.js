@@ -30,17 +30,17 @@ app.get('/health', (req, res) => {
   });
 });
 
-/* -------------------- Serve React Frontend -------------------- */
+/* -------------------- Serve React Frontend (Vite) -------------------- */
 const frontendBuildPath = path.join(__dirname, 'frontend', 'dist');
 
 if (fs.existsSync(frontendBuildPath)) {
   app.use(express.static(frontendBuildPath));
 
-  app.get('*', (req, res) => {
+  // Catch-all fallback for React Router
+  app.use((req, res) => {
     res.sendFile(path.join(frontendBuildPath, 'index.html'));
   });
 } else {
-  // Fallback if frontend build is missing
   app.get('/', (req, res) => {
     res.status(200).json({
       message: 'Backend is running. Frontend build not found.',
